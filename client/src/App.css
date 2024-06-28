@@ -38,3 +38,24 @@ nav {
   border-bottom: 2px solid #444; /* Border at the bottom */
 }
 
+h1 {
+  color: white;
+}
+
+p {
+  font-size: 1.5em;
+  color: #616CFF;
+}
+
+
+#home {
+  text-align: center;
+  min-height: 93vh;
+}
+
+#note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5em;
+}

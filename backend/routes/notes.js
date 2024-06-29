@@ -20,7 +20,7 @@ notesRouter.post("/", (req, res, next) => {
         text: noteText,
     }
     addNote(note)
-    res.redirect("/notes")
+    res.status(200).json(note)
 })
 
 notesRouter.delete("/:id", (req, res, next) => {

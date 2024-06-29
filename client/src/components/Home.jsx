@@ -1,23 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 
-const Home = () => {
+const Home = ({notes, deleteNote, addNote}) => {
 
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    const getNotes = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/notes')
-        const data = await response.json();
-        setNotes(data);
-      } catch (error) {
-        console.log("Error while fectching notes")
-      }
-    }
-
-    getNotes()
-  }, [])
+  const [text, setText] = useState("")
 
   return (
     <div id='home'>
@@ -27,17 +13,22 @@ const Home = () => {
       <div id='notes'>
         {notes.map(note => {
           return (
-            <div>
+            <div key={note.id}>
               <div id='note'>
                 <Link to={`/note/${note.id}`}>{note.text}</Link>
-                <button>Delete</button>
+                <button onClick={() => deleteNote(note.id)}>Delete</button>
               </div>
               <hr />
             </div>
           )
         })}
       </div>
-      <button>Add a new Note</button>
+      <input
+                onChange={(e) => setText(e.target.value)}
+                type='text'
+                value={text}
+            />
+      <button onClick={() => addNote(text)}>Add a new Note</button>
     </div>
   )
 }

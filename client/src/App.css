@@ -47,11 +47,17 @@ p {
   color: #616CFF;
 }
 
-
-#home {
-  text-align: center;
-  min-height: 93vh;
+input {
+  padding: 1em;
+  background-color: #333;
+  color: white;
+  border: 1px solid white;
+  border-radius: 2px;
+  min-width: 50vw;
+  margin: 1em;
 }
+
+
 
 #note {
   display: flex;
@@ -59,3 +65,4 @@ p {
   justify-content: center;
   gap: 5em;
 }
+

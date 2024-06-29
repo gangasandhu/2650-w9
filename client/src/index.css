@@ -25,9 +25,9 @@ a:hover {
 body {
   margin: 0;
   padding: 1em;
-  display: flex;
-  place-items: center;
   background-color: #1a1a1a;
+  text-align: center;
+  min-height: 93vh;
 }
 
 h1 {

@@ -1,4 +1,5 @@
 import "dotenv/config.js";
+import fetch from 'node-fetch'
 
 const genImage = async (req, res) => {
     const { query } = req.body;

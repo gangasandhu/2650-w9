@@ -1,96 +1,86 @@
-import './App.css'
-import Navbar from './components/Navbar'
+import './App.css';
+import Navbar from './components/Navbar';
 import {
   BrowserRouter as Router,
   Routes, Route, Link
-} from 'react-router-dom'
-import Home from './components/Home'
-import About from './components/About'
-import Note from './components/Note'
-import { useEffect, useState } from 'react'
+} from 'react-router-dom';
+import Home from './components/Home';
+import About from './components/About';
+import Note from './components/Note';
+import { useQuery, useMutation, gql } from '@apollo/client';
 
+const GET_NOTES = gql`
+  query GetNotes {
+    notes {
+      id
+      text
+    }
+  }
+`;
+
+const ADD_NOTE = gql`
+  mutation AddNote($text: String!) {
+    addNote(text: $text) {
+      id
+      text
+    }
+  }
+`;
+
+const DELETE_NOTE = gql`
+  mutation DeleteNote($id: ID!) {
+    deleteNote(id: $id)
+  }
+`;
+
+const UPDATE_NOTE = gql`
+  mutation UpdateNote($id: ID!, $text: String!) {
+    editNote(id: $id, text: $text) {
+      id
+      text
+    }
+  }
+`;
 
 function App() {
-
-
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    const getNotes = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/notes')
-        const data = await response.json();
-        setNotes(data);
-      } catch (error) {
-        console.log("Error while fectching notes")
-      }
-    }
-
-    getNotes()
-  }, [])
+  const { loading, error, data } = useQuery(GET_NOTES);
+  const [addNoteMutation] = useMutation(ADD_NOTE, {
+    refetchQueries: [GET_NOTES]
+  });
+  const [deleteNoteMutation] = useMutation(DELETE_NOTE, {
+    refetchQueries: [GET_NOTES]
+  });
+  const [updateNoteMutation] = useMutation(UPDATE_NOTE, {
+    refetchQueries: [GET_NOTES]
+  });
 
   const addNote = async (text) => {
-    try {
-      const response = await fetch(`http://localhost:3000/notes/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ noteText: text })
-      });
-      const newNote = await response.json()
-      setNotes([...notes, newNote]);
-    } catch (error) {
-      console.error('Error adding note:', error);
-    }
-  }
+    await addNoteMutation({ variables: { text } });
+  };
 
   const deleteNote = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:3000/notes/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      setNotes(notes.filter(note => note.id !== id));
-    } catch (error) {
-      console.error('Error deleting note:', error);
-    }
-  }
+    await deleteNoteMutation({ variables: { id } });
+  };
 
   const updateNote = async (updatedNote) => {
+    await updateNoteMutation({ variables: { id: updatedNote.id, text: updatedNote.text } });
+  };
 
-    try {
-      const response = await fetch(`http://localhost:3000/notes/${updatedNote.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ noteText: updatedNote.text })
-      });
-
-      const updatedNotes = notes.map(note => (note.id == updatedNote.id ? updatedNote : note));
-      setNotes(updatedNotes);
-    } catch (error) {
-      console.error('Error updating note:', error);
-    }
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home notes={notes} addNote={addNote} deleteNote={deleteNote} />} />
+          <Route path="/" element={<Home notes={data.notes} addNote={addNote} deleteNote={deleteNote} />} />
           <Route path="/about" element={<About />} />
-          <Route path="/note/:id" element={<Note notes={notes} updateNote={updateNote} />} />
-
+          <Route path="/note/:id" element={<Note notes={data.notes} updateNote={updateNote} />} />
         </Routes>
       </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
